@@ -1,0 +1,18 @@
+version: "3"
+services:
+  web:
+    image: fssai/get-started:part2                          # our image in repo
+    deploy:
+      replicas: 3                                             # run 5 instances
+      resources:
+        limits:
+          cpus: "0.1"            # limit each one ro 10% CPU (across all cores)
+          memory: 50M                                         # and 50MB of RAM
+      restart_policy:
+        condition: on-failure       # immediatly restart container if one fails
+    ports:
+      - "4000:80"                  # map port 4000 of host to 80 of service web
+    networks:    # instruct web containers to share port 80 via a load-balanced
+      - webnet  # network called webnet. (internally, the containers themselves   
+networks:                       # publist to web port 80 at an ephemeral port.)    
+  webnet:         # default settings (which is a load-balanced overlay network)
