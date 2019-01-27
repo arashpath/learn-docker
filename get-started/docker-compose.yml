@@ -3,7 +3,7 @@ services:
   web:
     image: fssai/get-started:part2                          # our image in repo
     deploy:
-      replicas: 3                                             # run 5 instances
+      replicas: 5                                             # run 5 instances
       resources:
         limits:
           cpus: "0.1"            # limit each one ro 10% CPU (across all cores)
