@@ -1,18 +1,42 @@
 version: "3"
 services:
   web:
-    image: fssai/get-started:part2                          # our image in repo
+    # replace username/repo:tag with your name and image details
+    image: fssai/get-started:part2
     deploy:
-      replicas: 5                                             # run 5 instances
+      replicas: 5
+      restart_policy:
+        condition: on-failure
       resources:
         limits:
-          cpus: "0.1"            # limit each one ro 10% CPU (across all cores)
-          memory: 50M                                         # and 50MB of RAM
-      restart_policy:
-        condition: on-failure       # immediatly restart container if one fails
+          cpus: "0.1"
+          memory: 50M
     ports:
-      - "4000:80"                  # map port 4000 of host to 80 of service web
-    networks:    # instruct web containers to share port 80 via a load-balanced
-      - webnet  # network called webnet. (internally, the containers themselves   
-networks:                       # publist to web port 80 at an ephemeral port.)    
-  webnet:         # default settings (which is a load-balanced overlay network)
+      - "80:80"
+    networks:
+      - webnet
+  visualizer:
+    image: dockersamples/visualizer:stable
+    ports:
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    networks:
+      - webnet
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - "/home/docker/data:/data"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    command: redis-server --appendonly yes
+    networks:
+      - webnet
+networks:
+  webnet:
